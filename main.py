@@ -16,8 +16,14 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 history: list[Content] = []
 
 
-def ask_model(user_input: str) -> GenerateContentResponse:
-    history.append(Content(role="user", parts=[Part(text=user_input)]))
+def ask_model(user_prompt: str) -> str:
+    """
+    Args:
+        user_prompt (str): User's prompt
+    Returns:
+        response.text (str): Gen AI's answer
+    """
+    history.append(Content(role="user", parts=[Part(text=user_prompt)]))
     response = client.models.generate_content(model="gemini-2.0-flash", 
                                               contents=history,
                                               config=GenerateContentConfig(
