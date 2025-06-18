@@ -23,15 +23,19 @@ client = genai.Client(api_key = GOOGLE_API_KEY)
 history: list[Content] = []
 
 
-def ask_model(user_prompt: str) -> str:
+def ask_model(user_prompt: str,
+              model: str = "gemini-2.5-flash-preview-04-17"
+              ) -> str:
     """
     Args:
         user_prompt (str): User's prompt
+        model (str): model name
+
     Returns:
         response.text (str): Gen AI's answer
     """
     history.append(Content(role="user", parts=[Part(text=user_prompt)]))
-    response = client.models.generate_content(model="gemini-2.0-flash", 
+    response = client.models.generate_content(model=model, 
                                               contents=history,
                                               config=GenerateContentConfig(
                                                 tools=[search_tool],
@@ -39,13 +43,14 @@ def ask_model(user_prompt: str) -> str:
                                                 )
                                             )
     history.append(Content(role="model", parts=[Part(text=response.text)]))
-    return f"{user_prompt}\n\n{response.text}"
+    return f"{user_prompt}\n\n{response.text}\n\nFROM: {model}"
 
 
 def send_slack_message(text: str) -> str:
     """
     Args:
         text (str): text which you want to send Slack
+    
     Returns:
         str
     """
