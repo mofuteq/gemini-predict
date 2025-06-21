@@ -1,3 +1,4 @@
+import re
 from slack_sdk import WebClient
 from slack_sdk.web.slack_response import SlackResponse
 from google import genai
@@ -12,6 +13,15 @@ class GeminiPredict(object):
                  channel: str,
                  model: str = "gemini-2.0-flash",
                  ) -> None:
+        """
+        Args:
+            api_key (str): GOOGLE_API_KEY
+            token (str): SLACK_API_TOKEN
+            channel (str): Channel ID of Slack
+            model (str): Gemini model name
+        Returns:
+            None
+        """
         self.api_key = api_key
         self.token = token
         self.channel = channel
@@ -45,7 +55,7 @@ class GeminiPredict(object):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{text}"
+                    "text": f"{text.replace("**", "*").replace("*   ", "* ").replace("   *", " *")}"
                 }
             },
             {
@@ -74,6 +84,9 @@ class GeminiPredict(object):
         """
         Args:
             user_prompt (str): User's prompt
+        
+        Returns:
+            response.text: str
         """
         self.history_list.append(Content(role="user", parts=[Part(text=user_prompt)]))
 

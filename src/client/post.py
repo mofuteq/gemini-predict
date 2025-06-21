@@ -14,7 +14,9 @@ data = {
     "name": "UHB杯"
 }
 
-response = requests.post(url, headers=headers, json=data)
+response = requests.post(url,
+                         headers=headers,
+                         json=data)
 
 print(response.status_code)
 print(response.json())
