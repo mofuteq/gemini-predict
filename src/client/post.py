@@ -9,9 +9,9 @@ headers = {
 }
 
 data = {
-    "place": "函館",
+    "place": "東京",
     "number": 11,
-    "name": "UHB杯"
+    "name": "府中牝馬ステークス"
 }
 
 response = requests.post(url,
