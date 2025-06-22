@@ -9,9 +9,9 @@ headers = {
 }
 
 data = {
-    "place": "東京",
+    "place": "阪神",
     "number": 11,
-    "name": "府中牝馬ステークス"
+    "name": "しらさぎS"
 }
 
 response = requests.post(url,
@@ -20,3 +20,5 @@ response = requests.post(url,
 
 print(response.status_code)
 print(response.json())
+
+# %%

@@ -55,7 +55,7 @@ class GeminiPredict(object):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{text.replace("*   ", "* ").replace("   *", " *")}"
+                    "text": f"{text}"
                 }
             },
             {
@@ -77,8 +77,8 @@ class GeminiPredict(object):
 
     def ask_model(self,
                 user_prompt: str,
-                temperature: float = 0.2,
-                top_k: float = 20,
+                temperature: float = 0.4,
+                top_k: float = 25,
                 top_p: float = 0.6
                 ) -> str:
         """
