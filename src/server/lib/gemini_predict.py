@@ -55,7 +55,7 @@ class GeminiPredict(object):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{text}"
+                    "text": f"{text.split("ただし、以下のフォーマットとします。")[1]}" # for reducing text length
                 }
             },
             {
@@ -89,7 +89,9 @@ class GeminiPredict(object):
             response.text: str
         """
         self.history_list.append(Content(role="user", parts=[Part(text=user_prompt)]))
-
+        self.temperature = temperature
+        self.top_k = top_k
+        self.top_p = top_p
         # Client
         client = genai.Client(api_key=self.api_key)
         response = client.models.generate_content(model=self.model,
@@ -97,9 +99,9 @@ class GeminiPredict(object):
                                                 config=GenerateContentConfig(
                                                     tools=self.tool_list,
                                                     response_modalities=["TEXT"],
-                                                    temperature=temperature,
-                                                    top_k=top_k,
-                                                    top_p=top_p
+                                                    temperature=self.temperature,
+                                                    top_k=self.top_k,
+                                                    top_p=self.top_p
                                                     )
                                                 )
         self.history_list.append(Content(role="model", parts=[Part(text=response.text)]))
