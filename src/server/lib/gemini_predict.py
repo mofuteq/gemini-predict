@@ -55,7 +55,7 @@ class GeminiPredict(object):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{text.split("ただし、以下のフォーマットとします。")[1]}" # for reducing text length
+                    "text": f"{text}"
                 }
             },
             {
@@ -106,8 +106,8 @@ class GeminiPredict(object):
                                                 )
         self.history_list.append(Content(role="model", parts=[Part(text=response.text)]))
         self.message = (
-            f"*Prompt:*\n```{user_prompt}```\n\n"
-            f"*Response:*\n{response.text}\n\n"
+            f"*:innocent:Prompt:*\n```{user_prompt.split("ただし、以下のフォーマットとします。")[0]}```\n\n"
+            f"*:hugging_face:Response:*\n{response.text}\n\n"
         )
         print(self.message)
         self.send_slack_message(self.message)
