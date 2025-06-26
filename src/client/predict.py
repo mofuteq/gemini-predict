@@ -1,22 +1,19 @@
 # %%
 import requests
 
-url = "http://127.0.0.1:8000/predict"
+url = "http://127.0.0.1:8000/prediction"
+
+params = {
+    "place": "小倉",
+    "number": 11,
+    "name": "佐世保S"
+}
 
 headers = {
-    "accept": "application/json",
-    "Content-Type": "application/json"
+    "accept": "application/json"
 }
 
-data = {
-    "place": "阪神",
-    "number": 11,
-    "name": "しらさぎS"
-}
-
-response = requests.post(url,
-                         headers=headers,
-                         json=data)
+response = requests.get(url, params=params, headers=headers)
 
 print(response.status_code)
 print(response.json())

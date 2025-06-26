@@ -34,21 +34,26 @@ slack_dict = {
 
 app = FastAPI()
 
+
 @app.get('/', status_code=302)
 async def root():
     return RedirectResponse('/docs')
 
 
-@app.post("/predict", status_code=201)
-async def predict(race: Race):
-    dt = datetime.datetime.today() 
+@app.get("/prediction")
+async def predict(place: str,
+                  number: int,
+                  name: str
+                  ):
+    dt = datetime.datetime.today()
     today = f"{dt.year}年{dt.month}月{dt.day}日(JST)"
-    race_info = f"{race.place}競馬場{race.number}R {race.name}"
-    channel = slack_dict[f"{race.place}"] if race.place in slack_dict.keys() else slack_dict["other"]
+    race_info = f"{place}競馬場{number}R {name}"
+    channel = slack_dict[f"{place}"] if place in slack_dict.keys(
+    ) else slack_dict["other"]
     gp = GeminiPredict(api_key=GOOGLE_API_KEY,
                        model="gemini-2.5-flash",
-                        token=SLACK_API_TOKEN,
-                        channel=channel)
+                       token=SLACK_API_TOKEN,
+                       channel=channel)
     # レース傾向まとめ
     trends_prompt = f"""\
     {race_info}について過去のレース傾向をまとめます。
@@ -141,7 +146,7 @@ async def predict(race: Race):
     df = pd.DataFrame(data={
         "date": today,
         "race": race_info,
-        "trends_prompt": trends_prompt, 
+        "trends_prompt": trends_prompt,
         "trends": trends,
         "contenders_prompt": contenders_prompt,
         "contenders": contenders,
@@ -155,12 +160,28 @@ async def predict(race: Race):
         "top_p": gp.top_p,
         "tool": f"{gp.tool_list}",
     },
-    index=[0]
+        index=[0]
     )
     try:
         df.to_csv("./log/data.csv", mode="x", index=False)
     except FileExistsError:
         df.to_csv("./log/data.csv", mode="a", header=None, index=False)
+    # for storing history
+    if os.path.exists("./log/history.pkl"):
+        past_history_df = pd.read_pickle("./log/history.pkl",
+                                         compression="tar")
+    else:
+        past_history_df = pd.DataFrame()
+    history_df = pd.DataFrame(data={
+        "date": today,
+        "race": race_info,
+        "history": [gp.history_list]
+    },
+        index=[0]
+    )
+    history_df = pd.concat([past_history_df, history_df])
+    history_df.to_pickle("./log/history.pkl",
+                         compression="tar")
     return {
         "trends": trends,
         "contenders": contenders,
@@ -168,15 +189,16 @@ async def predict(race: Race):
         "recommendation": recommendation
     }
 
+
 @app.get("/win5")
-async def predict():
+async def win5():
     today = datetime.datetime.today().date()
     date_delta = 6 - today.weekday()
     next_sunday = today + datetime.timedelta(days=date_delta)
     channel = slack_dict["win5"]
     gp = GeminiPredict(api_key=GOOGLE_API_KEY,
-                token=SLACK_API_TOKEN,
-                channel=channel)
+                       token=SLACK_API_TOKEN,
+                       channel=channel)
     # 馬券
     recommendation = gp.ask_model(f"""\
     まず、{next_sunday}に開催されるWIN5の対象となる5つのレースに関する情報を取得します。
