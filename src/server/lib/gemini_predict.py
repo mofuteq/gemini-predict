@@ -1,4 +1,3 @@
-import re
 from slack_sdk import WebClient
 from slack_sdk.web.slack_response import SlackResponse
 from google import genai
@@ -11,7 +10,6 @@ class GeminiPredict(object):
                  api_key: str,
                  token: str,
                  channel: str,
-                 model: str = "gemini-2.0-flash",
                  ) -> None:
         """
         Args:
@@ -25,14 +23,13 @@ class GeminiPredict(object):
         self.api_key = api_key
         self.token = token
         self.channel = channel
-        self.model = model
         self.history_list: list[Content] = []
-        self.tool_list: list[Tool] = [Tool(google_search = GoogleSearch())]
+        self.tool_list: list[Tool] = [Tool(google_search=GoogleSearch())]
         self.slack_client = WebClient(token=self.token)
 
     def send_slack_message(self,
-                        text: str,
-                        ) -> SlackResponse:
+                           text: str,
+                           ) -> SlackResponse:
         """
         Args:
             text (str): text which you want to send Slack
@@ -76,35 +73,44 @@ class GeminiPredict(object):
         return response
 
     def ask_model(self,
-                user_prompt: str,
-                temperature: float = 0.4,
-                top_k: float = 25,
-                top_p: float = 0.6
-                ) -> str:
+                  user_prompt: str,
+                  model: str = "gemini-2.5-flash",
+                  temperature: float = 0.4,
+                  top_k: float = 25,
+                  top_p: float = 0.6
+                  ) -> str:
         """
         Args:
-            user_prompt (str): User's prompt
-        
+            user_prompt (str): user prompt
+            model (str): model name
+            temperature (float): Temperature
+            top_k (float): Top K
+            top_p (float): Top P
+
         Returns:
             response.text: str
         """
-        self.history_list.append(Content(role="user", parts=[Part(text=user_prompt)]))
+        self.history_list.append(
+            Content(role="user", parts=[Part(text=user_prompt)]))
+        self.model = model
         self.temperature = temperature
         self.top_k = top_k
         self.top_p = top_p
         # Client
         client = genai.Client(api_key=self.api_key)
         response = client.models.generate_content(model=self.model,
-                                                contents=self.history_list,
-                                                config=GenerateContentConfig(
-                                                    tools=self.tool_list,
-                                                    response_modalities=["TEXT"],
-                                                    temperature=self.temperature,
-                                                    top_k=self.top_k,
-                                                    top_p=self.top_p
-                                                    )
-                                                )
-        self.history_list.append(Content(role="model", parts=[Part(text=response.text)]))
+                                                  contents=self.history_list,
+                                                  config=GenerateContentConfig(
+                                                      tools=self.tool_list,
+                                                      response_modalities=[
+                                                          "TEXT"],
+                                                      temperature=self.temperature,
+                                                      top_k=self.top_k,
+                                                      top_p=self.top_p
+                                                  )
+                                                  )
+        self.history_list.append(
+            Content(role="model", parts=[Part(text=response.text)]))
         self.message = (
             f"*:innocent:Prompt:*\n```{user_prompt.split("ただし、以下のフォーマットとします。")[0]}```\n\n"
             f"*:hugging_face:Response:*\n{response.text}\n\n"

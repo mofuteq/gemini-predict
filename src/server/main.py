@@ -51,7 +51,6 @@ async def predict(place: str,
     channel = slack_dict[f"{place}"] if place in slack_dict.keys(
     ) else slack_dict["other"]
     gp = GeminiPredict(api_key=GOOGLE_API_KEY,
-                       model="gemini-2.5-flash",
                        token=SLACK_API_TOKEN,
                        channel=channel)
     # レース傾向まとめ
