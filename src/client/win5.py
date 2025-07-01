@@ -1,7 +1,14 @@
 # %%
+import os
 import requests
+from dotenv import load_dotenv
 
-url = "http://127.0.0.1:8000/win5"
+# .env読み込み
+load_dotenv("../../.env")
+
+API_END_POINT = os.getenv("API_END_POINT")
+
+url = f"{API_END_POINT}/win5"
 
 headers = {
     "accept": "application/json",

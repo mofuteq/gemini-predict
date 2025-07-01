@@ -1,21 +1,24 @@
 # %%
+import os
 import requests
+from dotenv import load_dotenv
 
-url = "http://127.0.0.1:8000/prediction"
+# .env ファイルの読み込み
+load_dotenv("../../.env")
 
-params = {
-    "place": "小倉",
-    "number": 11,
-    "name": "佐世保S"
-}
+API_ENDPOINT = os.getenv("API_END_POINT")
+if not API_ENDPOINT:
+    raise ValueError("API_END_POINT が .env に定義されていません。")
 
-headers = {
-    "accept": "application/json"
-}
+url = f"{API_ENDPOINT}/prediction"
 
-response = requests.get(url, params=params, headers=headers)
+requests_datas = [
+    {"place": "函館", "number": 11, "name": "函館記念"},
+    {"place": "小倉", "number": 11, "name": "佐世保S"},
+    {"place": "福島", "number": 11, "name": "ラジオNIKKEI賞"}
+]
 
-print(response.status_code)
-print(response.json())
-
-# %%
+for request_data in requests_datas:
+    res = requests.get(url=url,
+                       params=request_data)
+    print(res)

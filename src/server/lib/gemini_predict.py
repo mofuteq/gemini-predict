@@ -1,7 +1,7 @@
 from slack_sdk import WebClient
 from slack_sdk.web.slack_response import SlackResponse
 from google import genai
-from google.genai.types import GenerateContentConfig, Part, Content, Tool, GoogleSearch
+from google.genai.types import GenerateContentConfig, Part, Content, Tool, GoogleSearch, ThinkingConfig
 
 
 class GeminiPredict(object):
@@ -75,9 +75,9 @@ class GeminiPredict(object):
     def ask_model(self,
                   user_prompt: str,
                   model: str = "gemini-2.5-flash",
-                  temperature: float = 0.4,
-                  top_k: float = 25,
-                  top_p: float = 0.6
+                  temperature: float | None = None,
+                  top_k: float | None = None,
+                  top_p: float | None = None
                   ) -> str:
         """
         Args:
@@ -90,12 +90,15 @@ class GeminiPredict(object):
         Returns:
             response.text: str
         """
+        # ToDo: Token数から履歴を削除する機能が必要
         self.history_list.append(
             Content(role="user", parts=[Part(text=user_prompt)]))
         self.model = model
         self.temperature = temperature
         self.top_k = top_k
         self.top_p = top_p
+        self.thinking_config = ThinkingConfig(
+            thinking_budget=-1) if "2.5" in self.model else None
         # Client
         client = genai.Client(api_key=self.api_key)
         response = client.models.generate_content(model=self.model,
@@ -104,9 +107,11 @@ class GeminiPredict(object):
                                                       tools=self.tool_list,
                                                       response_modalities=[
                                                           "TEXT"],
+                                                      thinking_config=self.thinking_config,
                                                       temperature=self.temperature,
                                                       top_k=self.top_k,
-                                                      top_p=self.top_p
+                                                      top_p=self.top_p,
+                                                      max_output_tokens=2700
                                                   )
                                                   )
         self.history_list.append(
