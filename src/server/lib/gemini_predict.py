@@ -8,15 +8,14 @@ class GeminiPredict(object):
 
     def __init__(self,
                  api_key: str,
-                 token: str,
-                 channel: str,
+                 token: str | None = None,
+                 channel: str | None = None,
                  ) -> None:
         """
         Args:
             api_key (str): GOOGLE_API_KEY
-            token (str): SLACK_API_TOKEN
-            channel (str): Channel ID of Slack
-            model (str): Gemini model name
+            token (str | None): SLACK_API_TOKEN
+            channel (str | None): Channel ID of Slack
         Returns:
             None
         """
@@ -110,8 +109,7 @@ class GeminiPredict(object):
                                                       thinking_config=self.thinking_config,
                                                       temperature=self.temperature,
                                                       top_k=self.top_k,
-                                                      top_p=self.top_p,
-                                                      max_output_tokens=2700
+                                                      top_p=self.top_p
                                                   )
                                                   )
         self.history_list.append(
@@ -120,6 +118,6 @@ class GeminiPredict(object):
             f"*:innocent:Prompt:*\n```{user_prompt.split("ただし、以下のフォーマットとします。")[0]}```\n\n"
             f"*:hugging_face:Response:*\n{response.text}\n\n"
         )
-        print(self.message)
-        self.send_slack_message(self.message)
+        if self.token and self.channel:
+            self.send_slack_message(self.message)
         return response.text

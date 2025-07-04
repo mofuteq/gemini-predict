@@ -8,9 +8,12 @@ uv sync
 cd src/server
 ```
 ```
-uv run uvicorn src.server.main:app --reload
+uv run uvicorn main:app --reload
 ```
 ## Client side
 ```
-uv run src/client/post.py
+cd src/server
+```
+```
+uv run predict.py
 ```

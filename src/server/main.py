@@ -106,6 +106,7 @@ async def predict(place: str,
         "top_k": gp.top_k,
         "top_p": gp.top_p,
         "tool": f"{gp.tool_list}",
+        "thinking_config": f"{gp.thinking_config}"
     },
         index=[0]
     )
