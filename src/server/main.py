@@ -56,7 +56,7 @@ async def predict(place: str,
     # レース傾向まとめ
     trends_prompt = f"""\
     {race_info}について購入する馬券を決めるために出走する馬やトラックバイアスの研究をします。
-    まずは、トラックバイアスや当日の天気、統計的に有利な枠や過去のレース傾向をまとめてください。
+    まずは、{today}から最も開催日時が近い{race_info}について情報を取得し、トラックバイアスや当日の天気、統計的に有利な枠や過去のレース傾向をまとめてください。
     """
     trends = gp.ask_model(trends_prompt,
                           simplify=True)

@@ -115,6 +115,8 @@ class GeminiPredict(object):
                                                       top_p=self.top_p
                                                   )
                                                   )
+        self.history_list.append(
+            Content(role="model", parts=[Part(text=response.text)]))
         if self.simplify:
             self.history_list.append(
                 Content(role="user", parts=[Part(text="重要なポイントを抑えたうえで、簡潔にまとめます。")]))
@@ -130,8 +132,8 @@ class GeminiPredict(object):
                                                           top_p=self.top_p
                                                       )
                                                       )
-        self.history_list.append(
-            Content(role="model", parts=[Part(text=response.text)]))
+            self.history_list.append(
+                Content(role="model", parts=[Part(text=response.text)]))
         self.message = (
             f"*:innocent:Prompt:*\n```{user_prompt}```\n\n"
             f"*:hugging_face:Response:*\n{response.text}\n\n"
