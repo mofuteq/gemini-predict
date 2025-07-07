@@ -13,9 +13,9 @@ if not API_ENDPOINT:
 url = f"{API_ENDPOINT}/prediction"
 
 requests_datas = [
-    {"place": "函館", "number": 11, "name": "函館記念"},
-    {"place": "小倉", "number": 11, "name": "佐世保S"},
-    {"place": "福島", "number": 11, "name": "ラジオNIKKEI賞"}
+    {"place": "函館", "number": 11, "name": "大沼S"},
+    {"place": "小倉", "number": 11, "name": "北九州記念"},
+    {"place": "福島", "number": 11, "name": "ジュライS"}
 ]
 
 for request_data in requests_datas:

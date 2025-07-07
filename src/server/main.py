@@ -57,38 +57,40 @@ async def predict(place: str,
     trends_prompt = f"""\
     {race_info}について購入する馬券を決めるために出走する馬やトラックバイアスの研究をします。
     まずは、トラックバイアスや当日の天気、統計的に有利な枠や過去のレース傾向をまとめてください。
-    ただし、2800文字以内に収めます。
     """
-    trends = gp.ask_model(trends_prompt)
+    trends = gp.ask_model(trends_prompt,
+                          simplify=True)
     # 有力馬・危険な馬・穴馬まとめ
     contenders_prompt = f"""\
     {race_info}について、馬券戦略を考える前にすべての出走馬について分析を行います。
     過去の出走成績からメンバーレベルを加味して印をつけてください。
     ただし、少しでも可能性がある馬は残してください。
-    ただし、2800文字以内に収めます。
     """
-    contenders = gp.ask_model(contenders_prompt)
+    contenders = gp.ask_model(contenders_prompt,
+                              simplify=True)
     # レース傾向予測
     forcasts_prompt = f"""\
-    出走馬について個別データ（過去5走ラップ、位置取り指数、調教タイムなど）を深掘りします。
+    {race_info}の出走馬について、個別データ（過去5走ラップ、位置取り指数、調教タイムなど）を深掘りします。
     個別データを加味して印を再検討してください。
-    ただし、2800文字以内に収めます。
     """
-    forcasts = gp.ask_model(forcasts_prompt)
+    forcasts = gp.ask_model(forcasts_prompt,
+                            simplify=True)
     # レース傾向予測
     forcasts_prompt = f"""\
     {race_info}について、ラップモデリングによる展開予測をします。
     同時に展開がスローになるかハイになるか、理由とともに考えてください。
-    ただし、2800文字以内に収めます。
     """
-    forcasts = gp.ask_model(forcasts_prompt)
+    forcasts = gp.ask_model(forcasts_prompt,
+                            model="gemini-2.5-flash",
+                            simplify=True)
     # 馬券
     recommendation_prompt = f"""\
     {race_info}について、展開別シナリオでの券種戦略へ進めてください。
-    安全寄りと穴狙い寄り両方を考えます。
-    ただし、2800文字以内に収めます。
+    安全寄りと穴狙い寄り両方を考えます。回答には軸馬と紐を含めます。
     """
-    recommendation = gp.ask_model(recommendation_prompt)
+    recommendation = gp.ask_model(recommendation_prompt,
+                                  model="gemini-2.5-flash",
+                                  simplify=True)
     # for debug
     df = pd.DataFrame(data={
         "date": today,

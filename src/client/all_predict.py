@@ -25,9 +25,9 @@ HEADERS = {
 def fetch_predictions():
     print(f"\n=== {datetime.now()} - /prediction 実行開始 ===")
     requests_data = [
-        {"place": "函館", "number": 11, "name": "TVh杯"},
-        {"place": "小倉", "number": 11, "name": "マレーシアC"},
-        {"place": "福島", "number": 11, "name": "TUF杯"}
+        {"place": "函館", "number": 11, "name": "大沼S"},
+        {"place": "小倉", "number": 11, "name": "北九州記念"},
+        {"place": "福島", "number": 11, "name": "ジュライS"}
     ]
 
     with requests.Session() as session:
@@ -62,9 +62,10 @@ def run_all():
 
 
 # 毎日15:00に両方のAPIを実行
-schedule.every().day.at("14:45").do(run_all)
+execute_time = "14:45"
+schedule.every().day.at(execute_time).do(run_all)
 
-print("スケジューラーを起動しました。毎日15:00に /prediction と /win5 を実行します。")
+print(f"スケジューラーを起動しました。毎日{execute_time}に /prediction と /win5 を実行します。")
 
 # スケジューラーのループ
 while True:

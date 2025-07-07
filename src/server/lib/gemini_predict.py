@@ -73,10 +73,11 @@ class GeminiPredict(object):
 
     def ask_model(self,
                   user_prompt: str,
-                  model: str = "gemini-2.5-flash",
+                  model: str = "gemini-2.0-flash",
                   temperature: float | None = None,
                   top_k: float | None = None,
-                  top_p: float | None = None
+                  top_p: float | None = None,
+                  simplify: bool = False,
                   ) -> str:
         """
         Args:
@@ -85,6 +86,7 @@ class GeminiPredict(object):
             temperature (float): Temperature
             top_k (float): Top K
             top_p (float): Top P
+            simplify (bool): Answer in simple sentence
 
         Returns:
             response.text: str
@@ -98,6 +100,7 @@ class GeminiPredict(object):
         self.top_p = top_p
         self.thinking_config = ThinkingConfig(
             thinking_budget=-1) if "2.5" in self.model else None
+        self.simplify = simplify
         # Client
         client = genai.Client(api_key=self.api_key)
         response = client.models.generate_content(model=self.model,
@@ -112,10 +115,25 @@ class GeminiPredict(object):
                                                       top_p=self.top_p
                                                   )
                                                   )
+        if self.simplify:
+            self.history_list.append(
+                Content(role="user", parts=[Part(text="重要なポイントを抑えたうえで、簡潔にまとめます。")]))
+            response = client.models.generate_content(model=self.model,
+                                                      contents=self.history_list,
+                                                      config=GenerateContentConfig(
+                                                          tools=self.tool_list,
+                                                          response_modalities=[
+                                                              "TEXT"],
+                                                          thinking_config=self.thinking_config,
+                                                          temperature=self.temperature,
+                                                          top_k=self.top_k,
+                                                          top_p=self.top_p
+                                                      )
+                                                      )
         self.history_list.append(
             Content(role="model", parts=[Part(text=response.text)]))
         self.message = (
-            f"*:innocent:Prompt:*\n```{user_prompt.split("ただし、以下のフォーマットとします。")[0]}```\n\n"
+            f"*:innocent:Prompt:*\n```{user_prompt}```\n\n"
             f"*:hugging_face:Response:*\n{response.text}\n\n"
         )
         if self.token and self.channel:
